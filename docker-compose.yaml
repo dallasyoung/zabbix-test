@@ -1,0 +1,27 @@
+version: "3.8"
+name: "zabbix-test"
+services:
+  sqlserver:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+  zabbixserver:
+    image: zabbix/zabbix-server-pgsql
+    depends_on:
+      - sqlserver
+    environment:
+      - DB_SERVER_HOST=sqlserver
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+  zabbixweb:
+    image: zabbix/zabbix-web-nginx-pgsql
+    depends_on:
+      - zabbixserver
+    environment:
+      - DB_SERVER_HOST=sqlserver
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - ZBX_SERVER_HOST=zabbixserver
+      - PHP_TZ=America/Regina
+    ports:
+      - 8080:8080
